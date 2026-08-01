@@ -1,0 +1,6 @@
+Flask>=3.0
+requests>=2.31
+user-agents>=2.2
+rich>=13.0
+geoip2>=4.8
+pyfiglet>=1.0
