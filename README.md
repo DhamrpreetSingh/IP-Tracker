@@ -254,7 +254,7 @@ app.run(host="127.0.0.1",port=5000)
 # ▶️ Running
 
 ```bash
-python 1.py
+python tracker.py
 ```
 
 Open
