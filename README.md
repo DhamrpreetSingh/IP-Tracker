@@ -174,7 +174,7 @@ IP-Tracker/
 ├── requirements.txt
 ├── README.md
 ├── LICENSE
-└── 1.py
+└── tracker.py
 ```
 
 ---
@@ -233,7 +233,7 @@ inside the project folder.
 
 # ⚙️ Configuration
 
-Edit inside `1.py`
+Edit inside `tracker.py`
 
 ```python
 YOUTUBE_URL="https://www.youtube.com/watch?v=F17CBysnRso"
