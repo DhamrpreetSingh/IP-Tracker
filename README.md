@@ -7,11 +7,11 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-Web%20Framework-000000?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com/)
 [![MIT License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-blue?style=for-the-badge)]()
+[![Platform](https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue?style=for-the-badge)]()
 [![Security](https://img.shields.io/badge/Purpose-Authorized%20Security%20Testing-red?style=for-the-badge)]()
 [![Maintained](https://img.shields.io/badge/Maintained-Yes-success?style=for-the-badge)]()
 
-*A cybersecurity demonstration project for collecting IP geolocation and browser telemetry in **authorized** security assessments, laboratory exercises, and educational environments.*
+> **Professional IP Geolocation & Browser Telemetry Demonstration Tool for Authorized Cybersecurity Testing**
 
 </div>
 
@@ -21,16 +21,16 @@
 
 > **This project is intended exclusively for authorized cybersecurity activities.**
 
-Use this software **only** when you have explicit permission from the owner of the system or participant.
+Use this software **only** with explicit permission from the owner of the system or participant.
 
-**Never use this project for:**
+This project **must not** be used for:
 
 - Unauthorized tracking
-- Phishing campaigns
+- Phishing
+- Surveillance
 - Stalking
 - Harassment
 - Doxxing
-- Surveillance
 - Privacy violations
 - Identity discovery
 - Illegal data collection
@@ -43,60 +43,102 @@ The author assumes **no responsibility** for misuse.
 
 ## 🌍 Network Intelligence
 
-- Public IP detection
-- Country identification
-- Region & State lookup
-- City detection
-- Postal code lookup
+- Public IP Detection
+- Country Detection
+- Region & State Lookup
+- City Detection
+- Postal Code
 - Latitude & Longitude
-- Timezone detection
+- Timezone Detection
 
 ---
 
 ## 🛰️ Geolocation
 
-- Local MaxMind GeoLite2 database support
-- Online IP enrichment
-- ISP detection
-- ASN lookup
-- Organization identification
-- Network provider information
+- MaxMind GeoLite2 Database
+- Online IP Enrichment
+- ISP Detection
+- ASN Lookup
+- Organization Detection
 
 ---
 
 ## 📱 Browser Fingerprinting
 
-Collects browser metadata such as:
-
-- Browser name
-- Browser version
+- Browser Name
+- Browser Version
+- Device Type
 - Operating System
-- Device type
-- Platform
-- User-Agent
+- User Agent
 - Language
-- Screen resolution
+- Screen Resolution
+- Platform
 - Timezone
-- Device capabilities
 
 ---
 
-## 📍 GPS Collection (Optional)
+## 📍 GPS Collection
 
-If the browser supports Geolocation API **and** the participant grants permission:
+When permission is granted:
 
 - GPS Latitude
 - GPS Longitude
 - Accuracy
 - Timestamp
 
-Otherwise the application automatically falls back to IP-based geolocation.
+Otherwise the application falls back to IP-based geolocation.
 
 ---
 
-## 📝 Logging
+# 📸 Demonstration Workflow
 
-Every visit is logged in JSONL format.
+The screenshots below demonstrate the application's workflow in an **authorized cybersecurity testing environment**.
+
+---
+
+## 🚀 1. Server Startup
+
+The application loads the GeoLite2 database and starts the Flask server.
+
+<p align="center">
+<img src="assets/Server-Start.png" width="95%" alt="Server Startup">
+</p>
+
+---
+
+## 🌐 2. Cloudflare Tunnel (Optional)
+
+For demonstrations or authorized remote testing, the application can be exposed using Cloudflare Tunnel.
+
+<p align="center">
+<img src="assets/Cloudflard-Tunnel.png" width="95%" alt="Cloudflare Tunnel">
+</p>
+
+---
+
+## 📊 3. Telemetry Captured
+
+After the participant visits the application and grants any requested permissions, collected telemetry is displayed in the terminal.
+
+<p align="center">
+<img src="assets/Telementry.png" width="95%" alt="Collected Telemetry">
+</p>
+
+---
+
+## 🎥 4. Redirect
+
+After telemetry collection, the visitor is redirected to the configured destination.
+
+<p align="center">
+<img src="assets/Redirect.png" width="95%" alt="Redirect Example">
+</p>
+
+---
+
+# 📝 Logging
+
+Every visit is stored as a daily JSONL log.
 
 ```
 logs/
@@ -106,12 +148,34 @@ logs/
 Each event includes:
 
 - Timestamp
-- IP
-- Browser details
+- IP Address
 - Geolocation
-- GPS (if permitted)
-- Network metadata
+- Browser Information
+- Device Information
+- GPS Coordinates (If Granted)
+- ISP Information
 
+---
+
+# 📦 Project Structure
+
+```
+IP-Tracker/
+
+├── assets/
+│   ├── server-start.png
+│   ├── cloudflare-tunnel.png
+│   ├── terminal-output.png
+│   └── redirect-demo.png
+│
+├── logs/
+│
+├── GeoLite2-City.mmdb
+├── requirements.txt
+├── README.md
+├── LICENSE
+└── 1.py
+```
 
 ---
 
@@ -120,32 +184,30 @@ Each event includes:
 Clone the repository
 
 ```bash
-git clone https://github.com/USERNAME/IP-Tracker.git
+git clone https://github.com/DhamrpreetSingh/IP-Tracker.git
 
 cd IP-Tracker
 ```
 
-Create a virtual environment
+Create Virtual Environment
 
 ```bash
 python -m venv .venv
 ```
 
-Activate it
-
-### Windows
+Windows
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-### Linux/macOS
+Linux/macOS
 
 ```bash
 source .venv/bin/activate
 ```
 
-Install dependencies
+Install Requirements
 
 ```bash
 pip install -r requirements.txt
@@ -167,43 +229,25 @@ GeoLite2-City.mmdb
 
 inside the project folder.
 
-Directory example
-
-```
-IP-Tracker/
-
-GeoLite2-City.mmdb
-1.py
-README.md
-```
-
 ---
 
 # ⚙️ Configuration
 
-Inside `1.py`
+Edit inside `1.py`
 
 ```python
-YOUTUBE_URL = "https://www.youtube.com/watch?v=F17CBysnRso"
+YOUTUBE_URL="https://www.youtube.com/watch?v=F17CBysnRso"
 
-GEO_DB_PATH = os.path.join(
-    os.path.dirname(__file__),
-    "GeoLite2-City.mmdb"
-)
+LOG_DIR="logs"
 
-LOG_DIR = "logs"
+GEO_DB_PATH="GeoLite2-City.mmdb"
 ```
 
 For local testing
 
 ```python
-app.run(
-    host="127.0.0.1",
-    port=5000
-)
+app.run(host="127.0.0.1",port=5000)
 ```
-
-Avoid exposing the development server directly to the Internet.
 
 ---
 
@@ -223,31 +267,27 @@ http://127.0.0.1:5000
 
 # 📊 Information Collected
 
-Depending on browser support and participant consent:
-
 | Category | Information |
 |-----------|-------------|
 | Network | IP Address |
-| Geo | Country |
-| Geo | Region |
-| Geo | City |
-| Geo | Postal Code |
+| Country | Country |
+| Region | Region |
+| City | City |
+| Postal Code | Postal Code |
 | Geo | Latitude |
 | Geo | Longitude |
 | Geo | Timezone |
-| ISP | ISP Name |
+| ISP | ISP |
 | ISP | ASN |
 | ISP | Organization |
-| Browser | Browser Name |
-| Browser | Browser Version |
-| Browser | Operating System |
-| Browser | Device Type |
+| Browser | Browser |
+| Browser | Version |
 | Browser | User-Agent |
-| Browser | Language |
-| Browser | Screen Size |
 | Browser | Platform |
+| Browser | Screen Resolution |
+| Browser | Language |
+| Browser | Device Type |
 | Browser | Timezone |
-| Browser | Device Capabilities |
 | GPS | Latitude *(Permission Required)* |
 | GPS | Longitude *(Permission Required)* |
 | GPS | Accuracy |
@@ -258,41 +298,37 @@ Depending on browser support and participant consent:
 
 For authorized deployments:
 
-- HTTPS only
+- HTTPS
 - Authentication
 - Authorization
+- Rate Limiting
+- Secure Logging
 - Reverse Proxy
 - Input Validation
-- Rate Limiting
-- Request Size Limits
-- Secure Log Storage
 - Data Retention Policy
-- Regular Dependency Updates
 
-Never trust:
+Never trust
 
 - X-Forwarded-For
-- Client supplied headers
-- Browser fingerprint alone
+- Client Headers
+- Browser Fingerprints Alone
 
 ---
 
 # 📚 Educational Use Cases
 
-Suitable for:
-
 - Cybersecurity Labs
 - Security Awareness Demonstrations
-- Web Security Classes
 - Browser Privacy Demonstrations
-- Geolocation Demonstrations
-- Network Security Exercises
+- Red Team Training
 - Blue Team Training
-- Red Team Simulations *(with authorization)*
+- Geolocation Demonstrations
+- University Projects
+- Authorized Penetration Testing
 
 ---
 
-# 📄 Logging Example
+# 📄 Example Log
 
 ```json
 {
@@ -301,7 +337,6 @@ Suitable for:
   "country":"India",
   "city":"Delhi",
   "browser":"Chrome",
-  "os":"Windows 11",
   "gps":null
 }
 ```
@@ -312,24 +347,24 @@ Suitable for:
 
 This application processes personal information.
 
-Before collecting any information, participants should be informed of:
+Participants should always be informed of:
 
 - What data is collected
 - Why it is collected
 - Where it is stored
 - Who can access it
-- How long it is retained
-- How it can be deleted
+- Data retention period
+- Deletion process
 
-GPS information is collected **only after explicit browser permission is granted.**
+GPS coordinates are collected **only after explicit browser permission is granted.**
 
 ---
 
 # 📜 License
 
-This project is licensed under the **MIT License**.
+Licensed under the **MIT License**.
 
-Third-party services and datasets remain under their respective licenses.
+Third-party services remain under their own licenses.
 
 - MaxMind GeoLite2
 - ip-api.com
@@ -341,15 +376,18 @@ Third-party services and datasets remain under their respective licenses.
 
 ## Dharmpreet Singh (Gh0$t)
 
-Cybersecurity Researcher
+**Cybersecurity Researcher**
 
-Offensive Security • Web Application Security • AI Security • Red Teaming
+- Offensive Security
+- Web Application Security
+- AI Security
+- Red Teaming
 
 ---
 
 <div align="center">
 
-### ⭐ If you found this project useful, consider giving it a Star.
+### ⭐ Star this repository if you found it useful!
 
 *"Knowledge is most valuable when used responsibly."*
 
