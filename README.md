@@ -111,7 +111,7 @@ The application loads the GeoLite2 database and starts the Flask server.
 For demonstrations or authorized remote testing, the application can be exposed using Cloudflare Tunnel.
 
 <p align="center">
-<img src="assets/Cloudflard-Tunnel.png" width="95%" alt="Cloudflare Tunnel">
+<img src="assets/Cloudflared-Tunnel.png" width="95%" alt="Cloudflare Tunnel">
 </p>
 
 ---
