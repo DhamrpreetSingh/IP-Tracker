@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IP-Tracker - Professional Flask-Based IP & Browser Telemetry Demonstration Tool for Authorized Cybersecurity Testing">
+    <meta name="keywords" content="IP tracker, geolocation, browser fingerprinting, cybersecurity, Flask, ethical hacking, penetration testing">
+    <meta name="author" content="Dharmpreet Singh">
+    <meta property="og:title" content="IP-Tracker - Geolocation & Browser Telemetry Tool">
+    <meta property="og:description" content="Professional Flask-Based IP & Browser Telemetry Demonstration Tool for Authorized Cybersecurity Testing">
+    <meta property="og:type" content="website">
+    <title>IP-Tracker - Geolocation & Browser Telemetry Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 20px;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            margin: 10px 10px 10px 0;
+            transition: transform 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+        .legal-notice {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        .legal-notice h2 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        .legal-notice p {
+            color: #856404;
+        }
+        footer {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #667eea;
+            background: #f8f9fa;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛰️ IP-Tracker</h1>
+            <p>Professional Flask-Based IP & Browser Telemetry Demonstration Tool</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">For Authorized Cybersecurity Testing</p>
+        </header>
+
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <span class="badge">Python 3.9+</span>
+                <span class="badge">Flask Framework</span>
+                <span class="badge">MIT License</span>
+                <span class="badge">Open Source</span>
+            </div>
+
+            <div class="legal-notice">
+                <h2>⚠️ Legal Notice</h2>
+                <p><strong>This project is intended exclusively for authorized cybersecurity activities.</strong></p>
+                <p>Use this software only with explicit permission from the owner of the system or participant. This project must not be used for unauthorized tracking, phishing, surveillance, stalking, harassment, doxxing, privacy violations, or illegal data collection.</p>
+                <p>The author assumes no responsibility for misuse.</p>
+            </div>
+
+            <h2 style="margin-top: 40px; color: #667eea;">✨ Key Features</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <h3>🌍 Network Intelligence</h3>
+                    <p>Public IP Detection, Country Detection, Region & State Lookup, City Detection, Postal Code, Latitude & Longitude, Timezone Detection</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🛰️ Geolocation</h3>
+                    <p>MaxMind GeoLite2 Database, Online IP Enrichment, ISP Detection, ASN Lookup, Organization Detection</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📱 Browser Fingerprinting</h3>
+                    <p>Browser Name & Version, Device Type, Operating System, User Agent, Language, Screen Resolution, Platform, Timezone</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📍 GPS Collection</h3>
+                    <p>Collect GPS Latitude, Longitude, and Accuracy when permission is granted. Falls back to IP-based geolocation otherwise.</p>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 40px; color: #667eea;">📝 Information Collected</h2>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Information</th>
+                </tr>
+                <tr>
+                    <td>Network</td>
+                    <td>IP Address, ISP, ASN, Organization</td>
+                </tr>
+                <tr>
+                    <td>Geolocation</td>
+                    <td>Country, Region, City, Postal Code, Latitude, Longitude, Timezone</td>
+                </tr>
+                <tr>
+                    <td>Browser</td>
+                    <td>Browser Name, Version, User-Agent, Platform, Screen Resolution, Language, Device Type</td>
+                </tr>
+                <tr>
+                    <td>GPS</td>
+                    <td>Latitude, Longitude, Accuracy (Permission Required)</td>
+                </tr>
+            </table>
+
+            <h2 style="margin-top: 40px; color: #667eea;">📚 Educational Use Cases</h2>
+            <ul>
+                <li>Cybersecurity Labs</li>
+                <li>Security Awareness Demonstrations</li>
+                <li>Browser Privacy Demonstrations</li>
+                <li>Red Team Training</li>
+                <li>Blue Team Training</li>
+                <li>Geolocation Demonstrations</li>
+                <li>University Projects</li>
+                <li>Authorized Penetration Testing</li>
+            </ul>
+
+            <h2 style="margin-top: 40px; color: #667eea;">🚀 Quick Start</h2>
+            <pre><code>git clone https://github.com/DhamrpreetSingh/IP-Tracker.git
+cd IP-Tracker
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python tracker.py</code></pre>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="https://github.com/DhamrpreetSingh/IP-Tracker" class="cta-button">📂 View on GitHub</a>
+                <a href="https://github.com/DhamrpreetSingh/IP-Tracker#-installation" class="cta-button">📖 Read Full Docs</a>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>IP-Tracker</strong> | Created by Dharmpreet Singh (Gh0$t)</p>
+            <p>Cybersecurity Researcher | Offensive Security | Web Application Security | Red Teaming</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">Licensed under MIT License | Knowledge is most valuable when used responsibly.</p>
+            <p style="margin-top: 10px;">⭐ <a href="https://github.com/DhamrpreetSingh/IP-Tracker" style="color: #667eea; text-decoration: none;">Star this repository</a> on GitHub</p>
+        </footer>
+    </div>
+</body>
+</html>
