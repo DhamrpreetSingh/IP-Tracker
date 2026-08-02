@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /logs/
+Crawl-delay: 1
+
+Sitemap: https://dhamrpreetsingh.github.io/IP-Tracker/sitemap.xml
