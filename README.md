@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🛰️ IP Tracker
+# 🔎 Recon Lens
 
-### A Professional Flask-Based IP & Browser Telemetry Demonstration Tool
+### 
 
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-Web%20Framework-000000?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com/)
@@ -11,7 +11,7 @@
 [![Security](https://img.shields.io/badge/Purpose-Authorized%20Security%20Testing-red?style=for-the-badge)]()
 [![Maintained](https://img.shields.io/badge/Maintained-Yes-success?style=for-the-badge)]()
 
-> **Professional IP Geolocation & Browser Telemetry Demonstration Tool for Authorized Cybersecurity Testing**
+> **Red Team Recon Lab: IP Intelligence, Browser Telemetry & Permission-Aware Collection**
 
 </div>
 
@@ -90,6 +90,18 @@ Otherwise the application falls back to IP-based geolocation.
 
 ---
 
+## 📷 Camera Permission and Capture
+
+The page requests camera access through the browser's permission prompt and records whether access was granted, denied, or unavailable.
+
+After access is granted, the current implementation captures a JPEG frame about once per second and sends it to the Flask server's `/upload_photo` endpoint. The server saves received frames as timestamped files in `pop/`.
+
+When camera access is granted, the configured destination is opened in a new tab. The demonstration page remains open in its original tab and may continue capturing frames while it remains active. Closing that tab ends its capture session; browser behavior may affect capture while the tab is in the background.
+
+
+
+---
+
 # 📸 Demonstration Workflow
 
 The screenshots below demonstrate the application's workflow in an **authorized cybersecurity testing environment**.
@@ -116,7 +128,27 @@ For demonstrations or authorized remote testing, the application can be exposed 
 
 ---
 
-## 📊 3. Telemetry Captured
+## 📷 3. Camera Permission and Capture
+
+The browser asks the visitor to grant or deny camera access. If access is granted.
+
+<p align="center">
+<img src="assets/capture.png" width="95%" alt="Camera capture demonstration">
+</p>
+
+The visitor workflow is:
+
+```text
+Visitor opens demonstration page
+→ location permission
+→ camera permission
+→ telemetry and camera processing
+→ redirect
+```
+
+---
+
+## 📊 4. Telemetry Captured
 
 After the participant visits the application and grants any requested permissions, collected telemetry is displayed in the terminal.
 
@@ -126,7 +158,7 @@ After the participant visits the application and grants any requested permission
 
 ---
 
-## 🎥 4. Redirect
+## 🎥 5. Redirect
 
 After telemetry collection, the visitor is redirected to the configured destination.
 
@@ -165,10 +197,13 @@ IP-Tracker/
 ├── assets/
 │   ├── server-start.png
 │   ├── cloudflare-tunnel.png
+│   ├── capture.png
 │   ├── terminal-output.png
 │   └── redirect-demo.png
 │
 ├── logs/
+├── pop/
+│   └── snap_YYYYMMDD_HHMMSS_microseconds.jpg
 │
 ├── GeoLite2-City.mmdb
 ├── requirements.txt
@@ -291,6 +326,8 @@ http://127.0.0.1:5000
 | GPS | Latitude *(Permission Required)* |
 | GPS | Longitude *(Permission Required)* |
 | GPS | Accuracy |
+| Camera | Permission status |
+| Camera | Frames/snapshots *(When permission is granted)* |
 
 ---
 
@@ -306,6 +343,10 @@ For authorized deployments:
 - Reverse Proxy
 - Input Validation
 - Data Retention Policy
+- Explicit camera consent
+- Secure storage of captured images
+- Access controls for logs and snapshots
+- A data retention and deletion policy for camera snapshots
 
 Never trust
 
@@ -325,6 +366,33 @@ Never trust
 - Geolocation Demonstrations
 - University Projects
 - Authorized Penetration Testing
+
+---
+
+# 🛡️ Security-Awareness Demonstrations
+
+This project can support authorized cybersecurity and security-awareness demonstrations, including showing how social-engineering links may lead people to expose private information or grant permissions.
+
+Common scam messages pressure people to act through:
+
+- Artificial urgency or fear
+- Fake government schemes
+- Freebies or rewards
+- Fake bank or KYC warnings
+- Malicious links that lead to permission requests
+
+Unnecessary permission grants can expose private information. A browser prompt should be read carefully, including which site is asking and what access it wants.
+
+> A suspicious link does not always try to steal your password immediately. It may first try to convince you to give a website access to something private.
+
+Encourage people, especially senior citizens, to:
+
+- Stop when a message creates artificial urgency.
+- Verify government and bank messages through official channels.
+- Avoid opening unexpected links.
+- Read browser permission prompts carefully.
+- Deny permissions a website does not need.
+- Ask a trusted person when uncertain.
 
 ---
 
@@ -357,6 +425,8 @@ Participants should always be informed of:
 - Deletion process
 
 GPS coordinates are collected **only after explicit browser permission is granted.**
+
+Camera data is sensitive. Camera access is controlled by the browser's permission mechanism, and camera frames are collected only during authorized demonstrations with informed participants who understand that granted access allows frames to be sent to and stored by the application. Protect captured images and delete them according to the project's retention policy.
 
 ---
 
