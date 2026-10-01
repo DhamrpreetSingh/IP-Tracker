@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔎 Trace Point 😈
+# 🔎 Trace Point 
 
 ### 
 
